@@ -10,9 +10,11 @@
 // http://creativecommons.org/licenses/by-sa/3.0/
 // **********************************************************************************************************
 
-#include <RFM69.h>
+#include <WildFire_RFM69.h>
 #include <SPI.h>
-#include <SPIFlash.h>
+#include <WildFire_SPIFlash.h>
+#include <WildFire.h>
+WildFire wf;
 
 //*****************************************************************************************************************************
 // ADJUST THE SETTINGS BELOW DEPENDING ON YOUR HARDWARE/SITUATION!
@@ -21,21 +23,22 @@
 #define GARAGENODEID  99
 #define NETWORKID     100
 //Match frequency to the hardware version of the radio on your Moteino (uncomment one):
-//#define FREQUENCY   RF69_433MHZ
+#define FREQUENCY   RF69_433MHZ
 //#define FREQUENCY   RF69_868MHZ
-#define FREQUENCY     RF69_915MHZ
+//#define FREQUENCY     RF69_915MHZ
 #define ENCRYPTKEY    "sampleEncryptKey" //has to be same 16 characters/bytes on all nodes, not more not less!
-//#define IS_RFM69HW  //uncomment only for RFM69HW! Leave out if you have RFM69W!
-#define LED           9
+#define IS_RFM69HW    //uncomment only for RFM69HW! Leave out if you have RFM69W!
+#define LED           6
 #define SERIAL_BAUD   115200
 #define ACK_TIME      30  // # of ms to wait for an ack
 //*****************************************************************************************************************************
 
-RFM69 radio;
-SPIFlash flash(8, 0xEF30); //EF40 for 16mbit windbond chip
+WildFire_RFM69 radio;
+WildFire_SPIFlash flash;
 byte readSerialLine(char* input, char endOfLineChar=10, byte maxLength=64, uint16_t timeout=50);
 
 void setup() {
+  wf.begin();
   Serial.begin(SERIAL_BAUD);
   delay(10);
   radio.initialize(FREQUENCY,NODEID,NETWORKID);

@@ -5,23 +5,26 @@
 // You are free to use/extend this library but please abide with the CCSA license:
 // http://creativecommons.org/licenses/by-sa/3.0/
 // 2013-06-14 (C) felix@lowpowerlab.com
+// 
+// Modified by Victor Aprea / Wicked Device for WildFire v3
+//
 // **********************************************************************************
-#include <RFM69.h>
-#include <RFM69registers.h>
+#include <WildFire_RFM69.h>
+#include <WildFire_RFM69registers.h>
 #include <SPI.h>
 
-volatile byte RFM69::DATA[MAX_DATA_LEN];
-volatile byte RFM69::_mode;       // current transceiver state
-volatile byte RFM69::DATALEN;
-volatile byte RFM69::SENDERID;
-volatile byte RFM69::TARGETID; //should match _address
-volatile byte RFM69::PAYLOADLEN;
-volatile byte RFM69::ACK_REQUESTED;
-volatile byte RFM69::ACK_RECEIVED; /// Should be polled immediately after sending a packet with ACK request
-volatile int RFM69::RSSI; //most accurate RSSI during reception (closest to the reception)
-RFM69* RFM69::selfPointer;
+volatile byte WildFire_RFM69::DATA[MAX_DATA_LEN];
+volatile byte WildFire_RFM69::_mode;       // current transceiver state
+volatile byte WildFire_RFM69::DATALEN;
+volatile byte WildFire_RFM69::SENDERID;
+volatile byte WildFire_RFM69::TARGETID; //should match _address
+volatile byte WildFire_RFM69::PAYLOADLEN;
+volatile byte WildFire_RFM69::ACK_REQUESTED;
+volatile byte WildFire_RFM69::ACK_RECEIVED; /// Should be polled immediately after sending a packet with ACK request
+volatile int WildFire_RFM69::RSSI; //most accurate RSSI during reception (closest to the reception)
+WildFire_RFM69* WildFire_RFM69::selfPointer;
 
-bool RFM69::initialize(byte freqBand, byte nodeID, byte networkID)
+bool WildFire_RFM69::initialize(byte freqBand, byte nodeID, byte networkID)
 {
   const byte CONFIG[][2] =
   {
@@ -82,21 +85,21 @@ bool RFM69::initialize(byte freqBand, byte nodeID, byte networkID)
   setHighPower(_isRFM69HW); //called regardless if it's a RFM69W or RFM69HW
   setMode(RF69_MODE_STANDBY);
 	while ((readReg(REG_IRQFLAGS1) & RF_IRQFLAGS1_MODEREADY) == 0x00); // Wait for ModeReady
-  attachInterrupt(0, RFM69::isr0, RISING);
+  attachInterrupt(0, WildFire_RFM69::isr0, RISING);
   
   selfPointer = this;
   _address = nodeID;
   return true;
 }
 
-void RFM69::setFrequency(uint32_t FRF)
+void WildFire_RFM69::setFrequency(uint32_t FRF)
 {
   writeReg(REG_FRFMSB, FRF >> 16);
   writeReg(REG_FRFMID, FRF >> 8);
   writeReg(REG_FRFLSB, FRF);
 }
 
-void RFM69::setMode(byte newMode)
+void WildFire_RFM69::setMode(byte newMode)
 {
 	if (newMode == _mode) return; //TODO: can remove this?
 
@@ -128,11 +131,11 @@ void RFM69::setMode(byte newMode)
 	_mode = newMode;
 }
 
-void RFM69::sleep() {
+void WildFire_RFM69::sleep() {
   setMode(RF69_MODE_SLEEP);
 }
 
-void RFM69::setAddress(byte addr)
+void WildFire_RFM69::setAddress(byte addr)
 {
   _address = addr;
 	writeReg(REG_NODEADRS, _address);
@@ -140,13 +143,13 @@ void RFM69::setAddress(byte addr)
 
 // set output power: 0=min, 31=max
 // this results in a "weaker" transmitted signal, and directly results in a lower RSSI at the receiver
-void RFM69::setPowerLevel(byte powerLevel)
+void WildFire_RFM69::setPowerLevel(byte powerLevel)
 {
   _powerLevel = powerLevel;
   writeReg(REG_PALEVEL, (readReg(REG_PALEVEL) & 0xE0) | (_powerLevel > 31 ? 31 : _powerLevel));
 }
 
-bool RFM69::canSend()
+bool WildFire_RFM69::canSend()
 {
   if (_mode == RF69_MODE_RX && PAYLOADLEN == 0 && readRSSI() < CSMA_LIMIT) //if signal stronger than -100dBm is detected assume channel activity
   {
@@ -156,7 +159,7 @@ bool RFM69::canSend()
   return false;
 }
 
-void RFM69::send(byte toAddress, const void* buffer, byte bufferSize, bool requestACK)
+void WildFire_RFM69::send(byte toAddress, const void* buffer, byte bufferSize, bool requestACK)
 {
   writeReg(REG_PACKETCONFIG2, (readReg(REG_PACKETCONFIG2) & 0xFB) | RF_PACKET2_RXRESTART); // avoid RX deadlocks
   while (!canSend()) receiveDone();
@@ -169,7 +172,7 @@ void RFM69::send(byte toAddress, const void* buffer, byte bufferSize, bool reque
 // The reason for the semi-automaton is that the lib is ingterrupt driven and
 // requires user action to read the received data and decide what to do with it
 // replies usually take only 5-8ms at 50kbps@915Mhz
-bool RFM69::sendWithRetry(byte toAddress, const void* buffer, byte bufferSize, byte retries, byte retryWaitTime) {
+bool WildFire_RFM69::sendWithRetry(byte toAddress, const void* buffer, byte bufferSize, byte retries, byte retryWaitTime) {
   long sentTime;
   for (byte i=0; i<=retries; i++)
   {
@@ -189,20 +192,20 @@ bool RFM69::sendWithRetry(byte toAddress, const void* buffer, byte bufferSize, b
 }
 
 /// Should be polled immediately after sending a packet with ACK request
-bool RFM69::ACKReceived(byte fromNodeID) {
+bool WildFire_RFM69::ACKReceived(byte fromNodeID) {
   if (receiveDone())
     return (SENDERID == fromNodeID || fromNodeID == RF69_BROADCAST_ADDR) && ACK_RECEIVED;
   return false;
 }
 
 /// Should be called immediately after reception in case sender wants ACK
-void RFM69::sendACK(const void* buffer, byte bufferSize) {
+void WildFire_RFM69::sendACK(const void* buffer, byte bufferSize) {
   byte sender = SENDERID;
   while (!canSend()) receiveDone();
   sendFrame(sender, buffer, bufferSize, false, true);
 }
 
-void RFM69::sendFrame(byte toAddress, const void* buffer, byte bufferSize, bool requestACK, bool sendACK)
+void WildFire_RFM69::sendFrame(byte toAddress, const void* buffer, byte bufferSize, bool requestACK, bool sendACK)
 {
   setMode(RF69_MODE_STANDBY); //turn off receiver to prevent reception while filling fifo
 	while ((readReg(REG_IRQFLAGS1) & RF_IRQFLAGS1_MODEREADY) == 0x00); // Wait for ModeReady
@@ -234,7 +237,7 @@ void RFM69::sendFrame(byte toAddress, const void* buffer, byte bufferSize, bool 
   setMode(RF69_MODE_STANDBY);
 }
 
-void RFM69::interruptHandler() {
+void WildFire_RFM69::interruptHandler() {
   //pinMode(4, OUTPUT);
   //digitalWrite(4, 1);
   if (_mode == RF69_MODE_RX && (readReg(REG_IRQFLAGS2) & RF_IRQFLAGS2_PAYLOADREADY))
@@ -270,9 +273,9 @@ void RFM69::interruptHandler() {
   //digitalWrite(4, 0);
 }
 
-void RFM69::isr0() { selfPointer->interruptHandler(); }
+void WildFire_RFM69::isr0() { selfPointer->interruptHandler(); }
 
-void RFM69::receiveBegin() {
+void WildFire_RFM69::receiveBegin() {
   DATALEN = 0;
   SENDERID = 0;
   TARGETID = 0;
@@ -286,7 +289,7 @@ void RFM69::receiveBegin() {
   setMode(RF69_MODE_RX);
 }
 
-bool RFM69::receiveDone() {
+bool WildFire_RFM69::receiveDone() {
 // ATOMIC_BLOCK(ATOMIC_FORCEON)
 // {
   noInterrupts(); //re-enabled in unselect() via setMode() or via receiveBegin()
@@ -308,7 +311,7 @@ bool RFM69::receiveDone() {
 // To enable encryption: radio.encrypt("ABCDEFGHIJKLMNOP");
 // To disable encryption: radio.encrypt(null) or radio.encrypt(0)
 // KEY HAS TO BE 16 bytes !!!
-void RFM69::encrypt(const char* key) {
+void WildFire_RFM69::encrypt(const char* key) {
   setMode(RF69_MODE_STANDBY);
   if (key!=0)
   {
@@ -321,7 +324,7 @@ void RFM69::encrypt(const char* key) {
   writeReg(REG_PACKETCONFIG2, (readReg(REG_PACKETCONFIG2) & 0xFE) | (key ? 1 : 0));
 }
 
-int RFM69::readRSSI(bool forceTrigger) {
+int WildFire_RFM69::readRSSI(bool forceTrigger) {
   int rssi = 0;
   if (forceTrigger)
   {
@@ -334,7 +337,7 @@ int RFM69::readRSSI(bool forceTrigger) {
   return rssi;
 }
 
-byte RFM69::readReg(byte addr)
+byte WildFire_RFM69::readReg(byte addr)
 {
   select();
   SPI.transfer(addr & 0x7F);
@@ -343,7 +346,7 @@ byte RFM69::readReg(byte addr)
   return regval;
 }
 
-void RFM69::writeReg(byte addr, byte value)
+void WildFire_RFM69::writeReg(byte addr, byte value)
 {
   select();
   SPI.transfer(addr | 0x80);
@@ -352,25 +355,25 @@ void RFM69::writeReg(byte addr, byte value)
 }
 
 /// Select the transceiver
-void RFM69::select() {
+void WildFire_RFM69::select() {
   noInterrupts();
   digitalWrite(_slaveSelectPin, LOW);
 }
 
 /// UNselect the transceiver chip
-void RFM69::unselect() {
+void WildFire_RFM69::unselect() {
   digitalWrite(_slaveSelectPin, HIGH);
   interrupts();
 }
 
 // ON  = disable filtering to capture all frames on network
 // OFF = enable node+broadcast filtering to capture only frames sent to this/broadcast address
-void RFM69::promiscuous(bool onOff) {
+void WildFire_RFM69::promiscuous(bool onOff) {
   _promiscuousMode=onOff;
   //writeReg(REG_PACKETCONFIG1, (readReg(REG_PACKETCONFIG1) & 0xF9) | (onOff ? RF_PACKET1_ADRSFILTERING_OFF : RF_PACKET1_ADRSFILTERING_NODEBROADCAST));
 }
 
-void RFM69::setHighPower(bool onOff) {
+void WildFire_RFM69::setHighPower(bool onOff) {
   _isRFM69HW = onOff;
   writeReg(REG_OCP, _isRFM69HW ? RF_OCP_OFF : RF_OCP_ON);
   if (_isRFM69HW) //turning ON
@@ -379,18 +382,18 @@ void RFM69::setHighPower(bool onOff) {
     writeReg(REG_PALEVEL, RF_PALEVEL_PA0_ON | RF_PALEVEL_PA1_OFF | RF_PALEVEL_PA2_OFF | _powerLevel); //enable P0 only
 }
 
-void RFM69::setHighPowerRegs(bool onOff) {
+void WildFire_RFM69::setHighPowerRegs(bool onOff) {
   writeReg(REG_TESTPA1, onOff ? 0x5D : 0x55);
   writeReg(REG_TESTPA2, onOff ? 0x7C : 0x70);
 }
 
-void RFM69::setCS(byte newSPISlaveSelect) {
+void WildFire_RFM69::setCS(byte newSPISlaveSelect) {
   _slaveSelectPin = newSPISlaveSelect;
   pinMode(_slaveSelectPin, OUTPUT);
 }
 
 //for debugging
-void RFM69::readAllRegs()
+void WildFire_RFM69::readAllRegs()
 {
   byte regVal;
 	
@@ -410,7 +413,7 @@ void RFM69::readAllRegs()
   unselect();
 }
 
-byte RFM69::readTemperature(byte calFactor)  //returns centigrade
+byte WildFire_RFM69::readTemperature(byte calFactor)  //returns centigrade
 {
   setMode(RF69_MODE_STANDBY);
   writeReg(REG_TEMP1, RF_TEMP1_MEAS_START);
@@ -418,7 +421,7 @@ byte RFM69::readTemperature(byte calFactor)  //returns centigrade
   return ~readReg(REG_TEMP2) + COURSE_TEMP_COEF + calFactor; //'complement'corrects the slope, rising temp = rising val
 }												   	  // COURSE_TEMP_COEF puts reading in the ballpark, user can add additional correction
 
-void RFM69::rcCalibration()
+void WildFire_RFM69::rcCalibration()
 {
   writeReg(REG_OSC1, RF_OSC1_RCCAL_START);
   while ((readReg(REG_OSC1) & RF_OSC1_RCCAL_DONE) == 0x00);

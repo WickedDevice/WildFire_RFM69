@@ -5,9 +5,12 @@
 // You are free to use/extend this library but please abide with the CC-BY-SA license:
 // http://creativecommons.org/licenses/by-sa/3.0/
 // 2013-06-14 (C) felix@lowpowerlab.com
+// 
+// Modified by Victor Aprea / Wicked Device for WildFire v3
+//
 // **********************************************************************************
-#ifndef RFM69_h
-#define RFM69_h
+#ifndef WILDFIRE_RFM69_h
+#define WILDFIRE_RFM69_h
 #include <Arduino.h>            //assumes Arduino IDE v1.0 or greater
 
 #define MAX_DATA_LEN         61 // to take advantage of the built in AES/CRC we want to limit the frame size to the internal FIFO size (66 bytes - 3 bytes overhead)
@@ -30,7 +33,7 @@
 #define COURSE_TEMP_COEF    -90 // puts the temperature reading in the ballpark, user can fine tune the returned value
 #define RF69_BROADCAST_ADDR 255
 
-class RFM69 {
+class WildFire_RFM69 {
   public:
     static volatile byte DATA[MAX_DATA_LEN];          // recv/xmit buf, including hdr & crc bytes
     static volatile byte DATALEN;
@@ -42,7 +45,7 @@ class RFM69 {
     static volatile int RSSI; //most accurate RSSI during reception (closest to the reception)
     static volatile byte _mode; //should be protected?
     
-    RFM69(byte slaveSelectPin=SPI_CS, byte interruptPin=RF69_IRQ_PIN, bool isRFM69HW=false) {
+    WildFire_RFM69(byte slaveSelectPin=7, byte interruptPin=RF69_IRQ_PIN, bool isRFM69HW=true) { // defaults for WildFire
       _slaveSelectPin = slaveSelectPin;
       _interruptPin = interruptPin;
       _mode = RF69_MODE_STANDBY;
@@ -80,7 +83,7 @@ class RFM69 {
     void virtual interruptHandler();
     void sendFrame(byte toAddress, const void* buffer, byte size, bool requestACK=false, bool sendACK=false);
 
-    static RFM69* selfPointer;
+    static WildFire_RFM69* selfPointer;
     byte _slaveSelectPin;
     byte _interruptPin;
     byte _address;

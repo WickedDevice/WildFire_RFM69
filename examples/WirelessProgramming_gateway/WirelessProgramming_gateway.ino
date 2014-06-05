@@ -18,31 +18,34 @@
 // is handled by the SPIFLash/WirelessHEX69 library, which also relies on the RFM12B library
 // These libraries and custom 1k Optiboot bootloader for the target node are at: http://github.com/lowpowerlab
 
-#include <RFM69.h>
+#include <WildFire_RFM69.h>
 #include <SPI.h>
-#include <SPIFlash.h>
-#include <WirelessHEX69.h>
+#include <WildFire_SPIFlash.h>
+#include <WildFire_WirelessHEX69.h>
+#include <WildFire.h>
+WildFire wf;
 
 #define NETWORKID          250  //what network this node is on
 #define NODEID               5  //this node's ID, should be unique among nodes on this NETWORKID
 //Match frequency to the hardware version of the radio on your Moteino (uncomment one):
-//#define FREQUENCY   RF69_433MHZ
+#define FREQUENCY   RF69_433MHZ
 //#define FREQUENCY   RF69_868MHZ
-#define FREQUENCY     RF69_915MHZ
+//#define FREQUENCY     RF69_915MHZ
 #define ENCRYPTKEY "sampleEncryptKey" //(16 bytes of your choice - keep the same on all encrypted nodes)
-//#define IS_RFM69HW            //uncomment only for RFM69HW! Leave out if you have RFM69W!
+#define IS_RFM69HW            //uncomment only for RFM69HW! Leave out if you have RFM69W!
 
-#define LED         9
+#define LED         6
 #define SERIAL_BAUD 115200
 #define ACK_TIME    50  // # of ms to wait for an ack
 #define TIMEOUT     3000
 
-RFM69 radio;
+WildFire_RFM69 radio;
 char c = 0;
 char input[64]; //serial input buffer
 byte targetID=0;
 
 void setup(){
+  wf.begin();
   Serial.begin(SERIAL_BAUD);
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
   radio.encrypt(ENCRYPTKEY); //OPTIONAL

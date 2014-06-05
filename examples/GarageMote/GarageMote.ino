@@ -17,8 +17,10 @@
 // http://creativecommons.org/licenses/by-sa/3.0/
 // **********************************************************************************************************
 
-#include <RFM69.h>  //install this library in your Arduino library directory from https://github.com/LowPowerLab/RFM69
+#include <WildFire_RFM69.h>  //install this library in your Arduino library directory from https://github.com/LowPowerLab/RFM69
 #include <SPI.h>
+#include <WildFire.h>
+WildFire wf;
 
 //*****************************************************************************************************************************
 // ADJUST THE SETTINGS BELOW DEPENDING ON YOUR HARDWARE/SITUATION!
@@ -27,11 +29,11 @@
 #define NODEID        99
 #define NETWORKID     100
 //Match frequency to the hardware version of the radio on your Moteino (uncomment one):
-//#define FREQUENCY   RF69_433MHZ
+#define FREQUENCY   RF69_433MHZ
 //#define FREQUENCY   RF69_868MHZ
-#define FREQUENCY     RF69_915MHZ
+//#define FREQUENCY     RF69_915MHZ
 #define ENCRYPTKEY    "sampleEncryptKey" //has to be same 16 characters/bytes on all nodes, not more not less!
-//#define IS_RFM69HW  //uncomment only for RFM69HW! Leave out if you have RFM69W!
+#define IS_RFM69HW    //uncomment only for RFM69HW! Leave out if you have RFM69W!
 
 #define HALLSENSOR1          A0
 #define HALLSENSOR1_EN        4
@@ -57,7 +59,7 @@
 #define STATUS_OPEN          3
 #define STATUS_UNKNOWN       4
 
-#define LED                  9   //pin connected to onboard LED
+#define LED                  6   //pin connected to onboard LED
 #define LED_PULSE_PERIOD  5000   //5s seems good value for pulsing/blinking (not too fast/slow)
 #define SERIAL_BAUD     115200
 #define SERIAL_EN                //comment out if you don't want any serial output
@@ -77,10 +79,11 @@ byte lastRequesterNodeID=0;
 long ledPulseTimestamp=0;
 int ledPulseValue=0;
 boolean ledPulseDirection=false; //false=down, true=up
-RFM69 radio;
+WildFire_RFM69 radio;
 
 void setup(void)
 {
+  wf.begin();
   Serial.begin(SERIAL_BAUD);
   pinMode(HALLSENSOR1, INPUT);
   pinMode(HALLSENSOR2, INPUT);

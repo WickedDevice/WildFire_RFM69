@@ -17,39 +17,35 @@
 // is handled by the SPIFLash/WirelessHEX69 library, which also relies on the RFM69 library
 // These libraries and custom 1k Optiboot bootloader are at: http://github.com/lowpowerlab
 
-#include <RFM69.h>
+#include <WildFire_RFM69.h>
 #include <SPI.h>
-#include <SPIFlash.h>
+#include <WildFire_SPIFlash.h>
 #include <avr/wdt.h>
-#include <WirelessHEX69.h>
+#include <WildFire_WirelessHEX69.h>
+#include <WildFire.h>
+WildFire wf;
 
 #define MYID        55       // node ID used for this unit
 #define NETWORKID   250
 //Match frequency to the hardware version of the radio on your Moteino (uncomment one):
-//#define FREQUENCY   RF69_433MHZ
+#define FREQUENCY   RF69_433MHZ
 //#define FREQUENCY   RF69_868MHZ
-#define FREQUENCY     RF69_915MHZ
-//#define IS_RFM69HW  //uncomment only for RFM69HW! Leave out if you have RFM69W!
+//#define FREQUENCY     RF69_915MHZ
+#define IS_RFM69HW  //uncomment only for RFM69HW! Leave out if you have RFM69W!
 #define SERIAL_BAUD 115200
 #define ACK_TIME    50  // # of ms to wait for an ack
 #define ENCRYPTKEY  "sampleEncryptKey"
-#define LED         9
+#define LED         6
 #define BLINKPERIOD 200
 
-RFM69 radio;
+WildFire_RFM69 radio;
 char input = 0;
 long lastPeriod = -1;
 
-/////////////////////////////////////////////////////////////////////////////
-// flash(SPI_CS, MANUFACTURER_ID)
-// SPI_CS          - CS pin attached to SPI flash chip (8 in case of Moteino)
-// MANUFACTURER_ID - OPTIONAL, 0x1F44 for adesto(ex atmel) 4mbit flash
-//                             0xEF30 for windbond 4mbit flash
-//                             0xEF40 for windbond 16/64mbit flash
-/////////////////////////////////////////////////////////////////////////////
-SPIFlash flash(8, 0xEF30); //EF30 for windbond 4mbit flash
+WildFire_SPIFlash flash;
 
 void setup(){
+  wf.begin();
   pinMode(LED, OUTPUT);
   Serial.begin(SERIAL_BAUD);
   radio.initialize(FREQUENCY,MYID,NETWORKID);
