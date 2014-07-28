@@ -9,7 +9,7 @@ WildFire wf;
 #define GATEWAYID   1
 #define FREQUENCY   RF69_433MHZ //Match this with the version of your Moteino! (others: RF69_433MHZ, RF69_868MHZ)
 #define KEY         "thisIsEncryptKey" //has to be same 16 characters/bytes on all nodes, not more not less!
-#define LED         9
+#define LED         6
 #define SERIAL_BAUD 115200
 #define ACK_TIME    30  // # of ms to wait for an ack
 
