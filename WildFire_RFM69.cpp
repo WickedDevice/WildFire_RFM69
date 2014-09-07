@@ -219,7 +219,7 @@ bool WildFire_RFM69::ACKReceived(byte fromNodeID) {
 }
 
 //check whether an ACK was requested in the last received packet (non-broadcasted packet)
-bool RFM69::ACKRequested() {
+bool WildFire_RFM69::ACKRequested() {
   return ACK_REQUESTED && (TARGETID != RF69_BROADCAST_ADDR);
 }
 

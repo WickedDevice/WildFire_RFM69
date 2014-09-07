@@ -42,7 +42,10 @@
 //   - Monitor battery voltage and issue a shutdown signal when battery runs low
 // This sketch may be extended to include integration with other LowPowerLab automation products
 // *************************************************************************************************************
-#define LED                 5     // LED pin, should be analog for fading effect (PWM)
+#include <WildFire.h>
+WildFire wf;
+
+#define LED                 6     // LED pin, should be analog for fading effect (PWM)
 #define BUTTON              3     // Power button pin
 #define SIG_REQUESTHALT     6     // Signal to Pi to ask for a shutdown
 #define SIG_OKTOCUTOFF      7     // Signal from Pi that it's OK to cutoff power
@@ -75,6 +78,7 @@ long lastPeriod = -1;
 float systemVoltage = 5;
 
 void setup() {
+  wf.begin();
   Serial.begin(115200);
   pinMode(BUTTON, INPUT_PULLUP);
   pinMode(SIG_OKTOCUTOFF, INPUT);
