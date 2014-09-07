@@ -33,7 +33,7 @@
 #define WILDFIRE_RFM69_h
 #include <Arduino.h>            //assumes Arduino IDE v1.0 or greater
 
-#define MAX_DATA_LEN         61 // to take advantage of the built in AES/CRC we want to limit the frame size to the internal FIFO size (66 bytes - 3 bytes overhead)
+#define RF69_MAX_DATA_LEN    61 // to take advantage of the built in AES/CRC we want to limit the frame size to the internal FIFO size (66 bytes - 3 bytes overhead)
 #define RF69_SPI_CS           7 // SS is the SPI slave select pin, for instance D10 on atmega328
 #define RF69_IRQ_PIN          2 // INT0 on AVRs should be connected to DIO0 (ex on Atmega328 it's D2)
 #define RF69_IRQ_NUM          0 
