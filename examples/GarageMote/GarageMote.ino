@@ -190,7 +190,7 @@ void loop()
 
     //first send any ACK to request
     DEBUG("   [RX_RSSI:");DEBUG(radio.readRSSI());DEBUG("]");
-    if (radio.ACK_REQUESTED)
+    if (radio.ACKRequested())
     {
       radio.sendACK();
       DEBUG(" - ACK sent.");

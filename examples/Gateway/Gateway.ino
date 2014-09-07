@@ -19,11 +19,13 @@ WildFire wf;
 #define ENCRYPTKEY    "sampleEncryptKey" //exactly the same 16 characters/bytes on all nodes!
 #define IS_RFM69HW    //uncomment only for RFM69HW! Leave out if you have RFM69W!
 #define ACK_TIME      30 // max # of ms to wait for an ack
+
 #define LED           6  // Moteinos have LEDs on D9
 #define SERIAL_BAUD   115200
 
 WildFire_RFM69 radio;
 WildFire_SPIFlash flash;
+
 bool promiscuousMode = false; //set to 'true' to sniff all packets on the same network
 
 void setup() {
@@ -32,7 +34,7 @@ void setup() {
   delay(10);
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
 #ifdef IS_RFM69HW
-  radio.setHighPower(); //uncomment only for RFM69HW!
+  radio.setHighPower(); //only for RFM69HW!
 #endif
   radio.encrypt(ENCRYPTKEY);
   radio.promiscuous(promiscuousMode);
@@ -40,7 +42,23 @@ void setup() {
   sprintf(buff, "\nListening at %d Mhz...", FREQUENCY==RF69_433MHZ ? 433 : FREQUENCY==RF69_868MHZ ? 868 : 915);
   Serial.println(buff);
   if (flash.initialize())
-    Serial.println("SPI Flash Init OK!");
+  {
+    Serial.print("SPI Flash Init OK ... UniqueID (MAC): ");
+    flash.readUniqueId();
+    for (byte i=0;i<8;i++)
+    {
+      Serial.print(flash.UNIQUEID[i], HEX);
+      Serial.print(' ');
+    }
+
+    //alternative way to read it:
+    //byte* MAC = flash.readUniqueId();
+    //for (byte i=0;i<8;i++)
+    //{
+    //  Serial.print(MAC[i], HEX);
+    //  Serial.print(' ');
+    //}
+  }
   else
     Serial.println("SPI Flash Init FAIL! (is chip present?)");
 }
@@ -78,7 +96,7 @@ void loop() {
     }
     if (input == 'D')
     {
-      Serial.print("Deleting Flash chip content... ");
+      Serial.print("Deleting Flash chip ... ");
       flash.chipErase();
       while(flash.busy());
       Serial.println("DONE");
@@ -112,7 +130,7 @@ void loop() {
       Serial.print((char)radio.DATA[i]);
     Serial.print("   [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
     
-    if (radio.ACK_REQUESTED)
+    if (radio.ACKRequested())
     {
       byte theNodeID = radio.SENDERID;
       radio.sendACK();
@@ -131,7 +149,6 @@ void loop() {
           Serial.print("ok!");
         else Serial.print("nothing");
       }
-      
     }
     Serial.println();
     Blink(LED,3);

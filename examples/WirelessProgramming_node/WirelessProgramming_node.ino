@@ -124,6 +124,7 @@ void loop(){
     CheckForWirelessHEX(radio, flash, true);
     Serial.println();
   }
+  //else Serial.print('.');
   
   ////////////////////////////////////////////////////////////////////////////////////////////
   // Real sketch code here, let's blink the onboard LED

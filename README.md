@@ -2,10 +2,10 @@ RFM69 Library
 ----------------
 By Felix Rusu (felix@lowpowerlab.com)
 <br/>
-Creative Commons Attrib Share-Alike License
-http://creativecommons.org/licenses/by-sa/3.0/
-
 RFM69 library for RFM69W, RFM69HW, RFM69CW, RFM69HCW (semtech SX1231, SX1231H)
+
+##License
+GPL 3.0, please see the License.txt file
 
 
 ##Features
@@ -38,7 +38,7 @@ See [this tutorial](http://learn.adafruit.com/arduino-tips-tricks-and-techniques
 - The library and examples are continuously improved as bugs and stability issues are discovered. Be sure to check back often for changes.
 - Moteino boards are loaded with fuses that will delay startup. This means that other boards like Duemilanove/UNO might need a delay() in the setup() function before doing anything - to allow the transceiver to power up.
 
-###Saple usage
+###Sample usage
 - [Node](https://github.com/LowPowerLab/RFM69/blob/master/Examples/Node/Node.ino)
 - [Gateway](https://github.com/LowPowerLab/RFM69/blob/master/Examples/Gateway/Gateway.ino)
 
@@ -55,3 +55,6 @@ http://lowpowerlab.com/blog/2013/06/20/rfm69-library/
 - I have tested open-air range on these transceivers (the W only) in various combinations.
 - I am happy to say that a range of upwards of 350m can be achieved. I went to local parks and in very large parking spaces and I ran out of space, so more than 350m is possible. Some users reported upwards of 500m by lowering the bitrate, and a forum user reported 1.5miles at 1.2Kbps: see http://lowpowerlab.com/forum/index.php/topic,112.msg288.html and http://lowpowerlab.com/moteino/#antennas
 - The caveat with these higher RF power units is that they need more DC power when they transmit. For battery powered motes, you will need to keep them powered down and only transmit periodically. Use the sleep() function to put the radios in low power mode and use the [LowPower](https://github.com/rocketscream/Low-Power) or [Narcoleptic](https://code.google.com/p/narcoleptic/) libraries to power down your arduino
+
+##License
+GPL 3.0. See License.txt file.

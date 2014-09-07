@@ -3,7 +3,6 @@
 // It also looks for an onboard FLASH chip, if present
 // Library and code by Felix Rusu - felix@lowpowerlab.com
 // Get the RFM69 and SPIFlash library at: https://github.com/LowPowerLab/
-
 #include <WildFire_RFM69.h>
 #include <SPI.h>
 #include <WildFire_SPIFlash.h>
@@ -44,7 +43,16 @@ void setup() {
   Serial.println(buff);
   
   if (flash.initialize())
-    Serial.println("SPI Flash Init OK!");
+  {
+    Serial.print("SPI Flash Init OK ... UniqueID (MAC): ");
+    flash.readUniqueId();
+    for (byte i=0;i<8;i++)
+    {
+      Serial.print(flash.UNIQUEID[i], HEX);
+      Serial.print(' ');
+    }
+    Serial.println();
+  }
   else
     Serial.println("SPI Flash Init FAIL! (is chip present?)");
 }
@@ -63,19 +71,20 @@ void loop() {
       Serial.print(TRANSMITPERIOD);
       Serial.println("ms\n");
     }
-    
+
     if (input == 'r') //d=dump register values
       radio.readAllRegs();
     //if (input == 'E') //E=enable encryption
     //  radio.encrypt(KEY);
     //if (input == 'e') //e=disable encryption
     //  radio.encrypt(null);
-    
+
     if (input == 'd') //d=dump flash area
     {
       Serial.println("Flash content:");
-      int counter = 0;
+      uint16_t counter = 0;
 
+      Serial.print("0-256: ");
       while(counter<=256){
         Serial.print(flash.readByte(counter++), HEX);
         Serial.print('.');
@@ -106,16 +115,15 @@ void loop() {
       Serial.print((char)radio.DATA[i]);
     Serial.print("   [RX_RSSI:");Serial.print(radio.RSSI);Serial.print("]");
 
-    if (radio.ACK_REQUESTED)
+    if (radio.ACKRequested())
     {
       radio.sendACK();
       Serial.print(" - ACK sent");
-      delay(10);
     }
     Blink(LED,5);
     Serial.println();
   }
-  
+
   //send FLASH id
   if(sendSize==0)
   {
@@ -124,7 +132,7 @@ void loop() {
     radio.sendWithRetry(GATEWAYID, buff, buffLen);
     delay(TRANSMITPERIOD);
   }
-  
+
   int currPeriod = millis()/TRANSMITPERIOD;
   if (currPeriod != lastPeriod)
   {

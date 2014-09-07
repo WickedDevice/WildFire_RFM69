@@ -26,7 +26,7 @@
 WildFire wf;
 
 #define NETWORKID          250  //what network this node is on
-#define NODEID               5  //this node's ID, should be unique among nodes on this NETWORKID
+#define NODEID             254  //this node's ID, should be unique among nodes on this NETWORKID
 //Match frequency to the hardware version of the radio on your Moteino (uncomment one):
 #define FREQUENCY   RF69_433MHZ
 //#define FREQUENCY   RF69_868MHZ
