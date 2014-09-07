@@ -94,7 +94,7 @@ void loop() {
     }
     if (input == 'D')
     {
-      Serial.print("Deleting Flash chip content... ");
+      Serial.print("Deleting Flash chip ... ");
       flash.chipErase();
       while(flash.busy());
       Serial.println("DONE");
@@ -147,7 +147,6 @@ void loop() {
           Serial.print("ok!");
         else Serial.print("nothing");
       }
-      
     }
     Serial.println();
     Blink(LED,3);

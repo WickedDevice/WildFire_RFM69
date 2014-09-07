@@ -33,10 +33,10 @@ WildFire wf;
 //#define FREQUENCY     RF69_915MHZ
 #define IS_RFM69HW  //uncomment only for RFM69HW! Leave out if you have RFM69W!
 #define SERIAL_BAUD 115200
-#define ACK_TIME    50  // # of ms to wait for an ack
+#define ACK_TIME    30  // # of ms to wait for an ack
 #define ENCRYPTKEY  "sampleEncryptKey"
 #define LED         6
-#define BLINKPERIOD 200
+#define BLINKPERIOD 500
 
 WildFire_RFM69 radio;
 char input = 0;

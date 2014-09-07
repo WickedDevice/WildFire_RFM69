@@ -103,8 +103,7 @@ bool WildFire_RFM69::initialize(byte freqBand, byte nodeID, byte networkID)
   setHighPower(_isRFM69HW); //called regardless if it's a RFM69W or RFM69HW
   setMode(RF69_MODE_STANDBY);
 	while ((readReg(REG_IRQFLAGS1) & RF_IRQFLAGS1_MODEREADY) == 0x00); // Wait for ModeReady
-	
-  attachInterrupt(0, WildFire_RFM69::isr0, RISING);
+  attachInterrupt(_interruptNum, WildFire_RFM69::isr0, RISING);
   
   selfPointer = this;
   _address = nodeID;

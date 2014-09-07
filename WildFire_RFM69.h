@@ -34,8 +34,9 @@
 #include <Arduino.h>            //assumes Arduino IDE v1.0 or greater
 
 #define MAX_DATA_LEN         61 // to take advantage of the built in AES/CRC we want to limit the frame size to the internal FIFO size (66 bytes - 3 bytes overhead)
-#define SPI_CS               SS // SS is the SPI slave select pin, for instance D10 on atmega328
+#define RF69_SPI_CS           7 // SS is the SPI slave select pin, for instance D10 on atmega328
 #define RF69_IRQ_PIN          2 // INT0 on AVRs should be connected to DIO0 (ex on Atmega328 it's D2)
+#define RF69_IRQ_NUM          0 
 #define CSMA_LIMIT          -90 // upper RX signal sensitivity threshold in dBm for carrier sense access
 #define RF69_MODE_SLEEP       0 // XTAL OFF
 #define	RF69_MODE_STANDBY     1 // XTAL ON
@@ -66,7 +67,7 @@ class WildFire_RFM69 {
     static volatile int RSSI; //most accurate RSSI during reception (closest to the reception)
     static volatile byte _mode; //should be protected?
     
-    WildFire_RFM69(byte slaveSelectPin=7, byte interruptPin=RF69_IRQ_PIN, bool isRFM69HW=true, byte interruptNum=RF69_IRQ_NUM) { // defaults for WildFire
+    WildFire_RFM69(byte slaveSelectPin=RF69_SPI_CS, byte interruptPin=RF69_IRQ_PIN, bool isRFM69HW=true, byte interruptNum=RF69_IRQ_NUM) { // defaults for WildFire
       _slaveSelectPin = slaveSelectPin;
       _interruptPin = interruptPin;
       _interruptNum = interruptNum;
