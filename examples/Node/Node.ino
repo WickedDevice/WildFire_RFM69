@@ -119,6 +119,7 @@ void loop() {
     {
       radio.sendACK();
       Serial.print(" - ACK sent");
+      delay(10);
     }
     Blink(LED,5);
     Serial.println();

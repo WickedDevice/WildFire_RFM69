@@ -19,13 +19,11 @@ WildFire wf;
 #define ENCRYPTKEY    "sampleEncryptKey" //exactly the same 16 characters/bytes on all nodes!
 #define IS_RFM69HW    //uncomment only for RFM69HW! Leave out if you have RFM69W!
 #define ACK_TIME      30 // max # of ms to wait for an ack
-
 #define LED           6  // Moteinos have LEDs on D9
 #define SERIAL_BAUD   115200
 
 WildFire_RFM69 radio;
 WildFire_SPIFlash flash;
-
 bool promiscuousMode = false; //set to 'true' to sniff all packets on the same network
 
 void setup() {
@@ -96,7 +94,7 @@ void loop() {
     }
     if (input == 'D')
     {
-      Serial.print("Deleting Flash chip ... ");
+      Serial.print("Deleting Flash chip content... ");
       flash.chipErase();
       while(flash.busy());
       Serial.println("DONE");
@@ -149,6 +147,7 @@ void loop() {
           Serial.print("ok!");
         else Serial.print("nothing");
       }
+      
     }
     Serial.println();
     Blink(LED,3);

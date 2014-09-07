@@ -33,18 +33,9 @@
 #define WILDFIRE_RFM69_h
 #include <Arduino.h>            //assumes Arduino IDE v1.0 or greater
 
-#define RF69_MAX_DATA_LEN         61 // to take advantage of the built in AES/CRC we want to limit the frame size to the internal FIFO size (66 bytes - 3 bytes overhead)
-#define RF69_SPI_CS               SS // SS is the SPI slave select pin, for instance D10 on atmega328
-
-// INT0 on AVRs should be connected to RFM69's DIO0 (ex on Atmega328 it's D2, on Atmega644/1284 it's D2)
-#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega88) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__) || defined(__AVR_ATmega32U4__)
-  #define RF69_IRQ_PIN          2
-  #define RF69_IRQ_NUM          0
-#elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284P__)
-  #define RF69_IRQ_PIN          2
-  #define RF69_IRQ_NUM          2
-#endif
-
+#define MAX_DATA_LEN         61 // to take advantage of the built in AES/CRC we want to limit the frame size to the internal FIFO size (66 bytes - 3 bytes overhead)
+#define SPI_CS               SS // SS is the SPI slave select pin, for instance D10 on atmega328
+#define RF69_IRQ_PIN          2 // INT0 on AVRs should be connected to DIO0 (ex on Atmega328 it's D2)
 #define CSMA_LIMIT          -90 // upper RX signal sensitivity threshold in dBm for carrier sense access
 #define RF69_MODE_SLEEP       0 // XTAL OFF
 #define	RF69_MODE_STANDBY     1 // XTAL ON
@@ -75,7 +66,7 @@ class WildFire_RFM69 {
     static volatile int RSSI; //most accurate RSSI during reception (closest to the reception)
     static volatile byte _mode; //should be protected?
     
-    WildFire_RFM69(byte slaveSelectPin=7, byte interruptPin=RF69_IRQ_PIN, bool isRFM69HW=true) { // defaults for WildFire
+    WildFire_RFM69(byte slaveSelectPin=7, byte interruptPin=RF69_IRQ_PIN, bool isRFM69HW=true, byte interruptNum=RF69_IRQ_NUM) { // defaults for WildFire
       _slaveSelectPin = slaveSelectPin;
       _interruptPin = interruptPin;
       _interruptNum = interruptNum;
