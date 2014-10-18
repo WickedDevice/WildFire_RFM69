@@ -5,32 +5,28 @@
 // Library and code by Felix Rusu - felix@lowpowerlab.com
 // Get the RFM69 and SPIFlash library at: https://github.com/LowPowerLab/
 
-#include <WildFire_RFM69.h>    //get it here: https://www.github.com/lowpowerlab/rfm69
+#include <RFM69.h>    //get it here: https://www.github.com/lowpowerlab/rfm69
 #include <SPI.h>      //get it here: https://github.com/lowpowerlab/spiflash
-#include <LowPower.h> //get library from: https://github.com/rocketscream/Low-Power
-                      //writeup here: http://www.rocketscream.com/blog/2011/07/04/lightweight-low-power-arduino-library/
-#include <WildFire.h>
-WildFire wf;                      
+#include <LowPower.h> //get library from: https://github.com/LowPowerLab/LowPower
 
 #define NODEID        18    //unique for each node on same network
 #define NETWORKID     100  //the same on all nodes that talk to each other
 #define GATEWAYID     1
 //Match frequency to the hardware version of the radio on your Moteino (uncomment one):
-#define FREQUENCY     RF69_433MHZ
+//#define FREQUENCY     RF69_433MHZ
 //#define FREQUENCY     RF69_868MHZ
-//#define FREQUENCY     RF69_915MHZ
+#define FREQUENCY     RF69_915MHZ
 #define ENCRYPTKEY    "sampleEncryptKey" //exactly the same 16 characters/bytes on all nodes!
-#define IS_RFM69HW    //uncomment only for RFM69HW! Leave out if you have RFM69W!
+//#define IS_RFM69HW    //uncomment only for RFM69HW! Leave out if you have RFM69W!
 #define ACK_TIME      30 // max # of ms to wait for an ack
-#define LED           6  // Moteinos have LEDs on D9
+#define LED           9  // Moteinos have LEDs on D9
 #define SERIAL_BAUD   115200
 #define MOTIONPIN     1 //hardware interrupt 1 (D3)
 
-WildFire_RFM69 radio;
+RFM69 radio;
 volatile boolean motionDetected=false;
 
 void setup() {
-  wf.begin();
   Serial.begin(SERIAL_BAUD);
   radio.initialize(FREQUENCY,NODEID,NETWORKID);
 #ifdef IS_RFM69HW
