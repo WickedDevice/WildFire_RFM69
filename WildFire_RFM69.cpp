@@ -6,25 +6,25 @@
 // **********************************************************************************
 // License
 // **********************************************************************************
-// This program is free software; you can redistribute it 
-// and/or modify it under the terms of the GNU General    
-// Public License as published by the Free Software       
-// Foundation; either version 2 of the License, or        
-// (at your option) any later version.                    
-//                                                        
-// This program is distributed in the hope that it will   
-// be useful, but WITHOUT ANY WARRANTY; without even the  
-// implied warranty of MERCHANTABILITY or FITNESS FOR A   
-// PARTICULAR PURPOSE.  See the GNU General Public        
-// License for more details.                              
-//                                                        
-// You should have received a copy of the GNU General    
-// Public License along with this program; if not, write 
-// to the Free Software Foundation, Inc.,                
+// This program is free software; you can redistribute it
+// and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software
+// Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will
+// be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A
+// PARTICULAR PURPOSE.  See the GNU General Public
+// License for more details.
+//
+// You should have received a copy of the GNU General
+// Public License along with this program; if not, write
+// to the Free Software Foundation, Inc.,
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-//                                                        
-// Licence can be viewed at                               
-// http://www.fsf.org/licenses/gpl.txt                    
+//
+// Licence can be viewed at
+// http://www.fsf.org/licenses/gpl.txt
 //
 // Please maintain this license information along with authorship
 // and copyright notices in any redistribution of this code
@@ -58,7 +58,7 @@ bool WildFire_RFM69::initialize(byte freqBand, byte nodeID, byte networkID)
     /* 0x07 */ { REG_FRFMSB, (freqBand==RF69_315MHZ ? RF_FRFMSB_315 : (freqBand==RF69_433MHZ ? RF_FRFMSB_433 : (freqBand==RF69_868MHZ ? RF_FRFMSB_868 : RF_FRFMSB_915))) },
     /* 0x08 */ { REG_FRFMID, (freqBand==RF69_315MHZ ? RF_FRFMID_315 : (freqBand==RF69_433MHZ ? RF_FRFMID_433 : (freqBand==RF69_868MHZ ? RF_FRFMID_868 : RF_FRFMID_915))) },
     /* 0x09 */ { REG_FRFLSB, (freqBand==RF69_315MHZ ? RF_FRFLSB_315 : (freqBand==RF69_433MHZ ? RF_FRFLSB_433 : (freqBand==RF69_868MHZ ? RF_FRFLSB_868 : RF_FRFLSB_915))) },
-    
+
     // looks like PA1 and PA2 are not implemented on RFM69W, hence the max output power is 13dBm
     // +17dBm and +20dBm are possible on RFM69HW
     // +13dBm formula: Pout=-18+OutputPower (with PA0 or PA1**)
@@ -66,7 +66,7 @@ bool WildFire_RFM69::initialize(byte freqBand, byte nodeID, byte networkID)
     // +20dBm formula: Pout=-11+OutputPower (with PA1 and PA2)** and high power PA settings (section 3.3.7 in datasheet)
     ///* 0x11 */ { REG_PALEVEL, RF_PALEVEL_PA0_ON | RF_PALEVEL_PA1_OFF | RF_PALEVEL_PA2_OFF | RF_PALEVEL_OUTPUTPOWER_11111},
     ///* 0x13 */ { REG_OCP, RF_OCP_ON | RF_OCP_TRIM_95 }, //over current protection (default is 95mA)
-    
+
     // RXBW defaults are { REG_RXBW, RF_RXBW_DCCFREQ_010 | RF_RXBW_MANT_24 | RF_RXBW_EXP_5} (RxBw: 10.4khz)
     /* 0x19 */ { REG_RXBW, RF_RXBW_DCCFREQ_010 | RF_RXBW_MANT_16 | RF_RXBW_EXP_2 }, //(BitRate < 2 * RxBw)
     //for BR-19200: //* 0x19 */ { REG_RXBW, RF_RXBW_DCCFREQ_010 | RF_RXBW_MANT_24 | RF_RXBW_EXP_3 },
@@ -89,7 +89,7 @@ bool WildFire_RFM69::initialize(byte freqBand, byte nodeID, byte networkID)
 
   pinMode(_slaveSelectPin, OUTPUT);
   SPI.begin();
-  
+
   do writeReg(REG_SYNCVALUE1, 0xaa); while (readReg(REG_SYNCVALUE1) != 0xaa);
 	do writeReg(REG_SYNCVALUE1, 0x55); while (readReg(REG_SYNCVALUE1) != 0x55);
 
@@ -104,7 +104,7 @@ bool WildFire_RFM69::initialize(byte freqBand, byte nodeID, byte networkID)
   setMode(RF69_MODE_STANDBY);
 	while ((readReg(REG_IRQFLAGS1) & RF_IRQFLAGS1_MODEREADY) == 0x00); // Wait for ModeReady
   attachInterrupt(_interruptNum, WildFire_RFM69::isr0, RISING);
-  
+
   selfPointer = this;
   _address = nodeID;
   return true;
@@ -242,14 +242,14 @@ void WildFire_RFM69::sendFrame(byte toAddress, const void* buffer, byte bufferSi
 	SPI.transfer(bufferSize + 3);
 	SPI.transfer(toAddress);
   SPI.transfer(_address);
-  
+
   //control byte
   if (sendACK)
     SPI.transfer(0x80);
   else if (requestACK)
     SPI.transfer(0x40);
   else SPI.transfer(0x00);
-  
+
 	for (byte i = 0; i < bufferSize; i++)
     SPI.transfer(((byte*)buffer)[i]);
 	unselect();
@@ -283,10 +283,10 @@ void WildFire_RFM69::interruptHandler() {
     DATALEN = PAYLOADLEN - 3;
     SENDERID = SPI.transfer(0);
     byte CTLbyte = SPI.transfer(0);
-    
+
     ACK_RECEIVED = CTLbyte & 0x80; //extract ACK-requested flag
     ACK_REQUESTED = CTLbyte & 0x40; //extract ACK-received flag
-    
+
     for (byte i= 0; i < DATALEN; i++)
     {
       DATA[i] = SPI.transfer(0);
@@ -432,7 +432,7 @@ void WildFire_RFM69::setCS(byte newSPISlaveSelect) {
 void WildFire_RFM69::readAllRegs()
 {
   byte regVal;
-	
+
   for (byte regAddr = 1; regAddr <= 0x4F; regAddr++)
 	{
     select();
